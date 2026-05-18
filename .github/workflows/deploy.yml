@@ -1,0 +1,67 @@
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_FRONTEND: three-tier-app-frontend
+  ECR_BACKEND: three-tier-app-backend
+  ECS_CLUSTER: three-tier-app-cluster
+  FRONTEND_SERVICE: three-tier-app-frontend-svc
+  BACKEND_SERVICE: three-tier-app-backend-svc
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build & Push Frontend image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build \
+            --build-arg REACT_APP_API_URL=http://${{ secrets.ALB_DNS }}/api \
+            -t $ECR_REGISTRY/$ECR_FRONTEND:latest \
+            ./frontend
+          docker push $ECR_REGISTRY/$ECR_FRONTEND:latest
+
+      - name: Build & Push Backend image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_BACKEND:latest ./backend
+          docker push $ECR_REGISTRY/$ECR_BACKEND:latest
+
+      - name: Force new ECS deployment (Backend)
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $BACKEND_SERVICE \
+            --force-new-deployment
+
+      - name: Force new ECS deployment (Frontend)
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $FRONTEND_SERVICE \
+            --force-new-deployment
+
+      - name: Deployment complete
+        run: echo "✅ Deployment successful! App is live on ALB."
