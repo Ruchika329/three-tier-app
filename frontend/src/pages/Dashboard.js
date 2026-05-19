@@ -83,7 +83,7 @@ export default function Dashboard() {
         </div>
 
         <div className="task-form">
-          <h3>➕ New Task Add Karo</h3>
+          <h3>➕ Add New Task</h3>
           {error && <div className="error-msg">{error}</div>}
           <form onSubmit={handleAdd}>
             <input type="text" placeholder="Task title *" value={form.title}
@@ -101,7 +101,7 @@ export default function Dashboard() {
         {tasks.length === 0 ? (
           <div className="empty-state">
             <p style={{fontSize:'3rem'}}>📭</p>
-            <p>Don't load your task.</p>
+            <p>Add Your Task.</p>
           </div>
         ) : (
           <div className="tasks-grid">
