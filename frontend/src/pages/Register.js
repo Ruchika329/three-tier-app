@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../index.css';
 
-const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API = (process.env.REACT_APP_API_URL || 'http://localhost:5000').replace(/\/api$/, '');
 
 export default function Register() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });

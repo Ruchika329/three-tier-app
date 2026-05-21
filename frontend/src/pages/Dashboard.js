@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../index.css';
 
-const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API = (process.env.REACT_APP_API_URL || 'http://localhost:5000').replace(/\/api$/, '');
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
@@ -21,7 +21,7 @@ export default function Dashboard() {
       const res = await axios.get(`${API}/api/tasks`, { headers });
       setTasks(res.data);
     } catch {
-      setError('Do not load your tasks.');
+      setError('Do not load your tasks. Plz try again');
     }
   };
 
@@ -77,9 +77,9 @@ export default function Dashboard() {
       <div className="dashboard-container">
         <div className="stats-bar">
           <div className="stat-card"><div className="number">{tasks.length}</div><div className="label">Total Tasks</div></div>
-          <div className="stat-card"><div className="number" style={{color:'#ed8936'}}>{pending}</div><div className="label">Pending</div></div>
-          <div className="stat-card"><div className="number" style={{color:'#667eea'}}>{inProgress}</div><div className="label">In Progress</div></div>
-          <div className="stat-card"><div className="number" style={{color:'#38a169'}}>{completed}</div><div className="label">Completed</div></div>
+          <div className="stat-card"><div className="number" style={{ color: '#ed8936' }}>{pending}</div><div className="label">Pending</div></div>
+          <div className="stat-card"><div className="number" style={{ color: '#667eea' }}>{inProgress}</div><div className="label">In Progress</div></div>
+          <div className="stat-card"><div className="number" style={{ color: '#38a169' }}>{completed}</div><div className="label">Completed</div></div>
         </div>
 
         <div className="task-form">
@@ -87,12 +87,12 @@ export default function Dashboard() {
           {error && <div className="error-msg">{error}</div>}
           <form onSubmit={handleAdd}>
             <input type="text" placeholder="Task title *" value={form.title}
-              onChange={e => setForm({...form, title: e.target.value})} required />
+              onChange={e => setForm({ ...form, title: e.target.value })} required />
             <textarea rows="2" placeholder="Description (optional)"
               value={form.description}
-              onChange={e => setForm({...form, description: e.target.value})} />
+              onChange={e => setForm({ ...form, description: e.target.value })} />
             <button className="btn btn-primary" type="submit" disabled={loading}
-              style={{width:'auto', padding:'0.6rem 1.5rem'}}>
+              style={{ width: 'auto', padding: '0.6rem 1.5rem' }}>
               {loading ? 'Adding...' : 'Add Task'}
             </button>
           </form>
@@ -100,8 +100,8 @@ export default function Dashboard() {
 
         {tasks.length === 0 ? (
           <div className="empty-state">
-            <p style={{fontSize:'3rem'}}>📭</p>
-            <p>Add Your Task.</p>
+            <p style={{ fontSize: '3rem' }}>📭</p>
+            <p>Add Your Tasks.</p>
           </div>
         ) : (
           <div className="tasks-grid">
@@ -114,7 +114,7 @@ export default function Dashboard() {
                 {task.description && <p>{task.description}</p>}
                 <div className="task-actions">
                   {task.status !== 'in-progress' && (
-                    <button className="btn btn-sm" style={{background:'#667eea',color:'white'}}
+                    <button className="btn btn-sm" style={{ background: '#667eea', color: 'white' }}
                       onClick={() => handleStatus(task.id, 'in-progress')}>In Progress</button>
                   )}
                   {task.status !== 'completed' && (
