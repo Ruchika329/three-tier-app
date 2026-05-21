@@ -36,7 +36,7 @@ export default function Register() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>📝 Register</h2>
+        <h2>📝Register</h2>
         {error && <div className="error-msg">{error}</div>}
         {success && <div className="success-msg">{success}</div>}
         <form onSubmit={handleSubmit}>
